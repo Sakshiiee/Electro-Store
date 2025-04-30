@@ -1,0 +1,21 @@
+package com.lcwd.electronic.store.ElectronicStores.services;
+
+import com.lcwd.electronic.store.ElectronicStores.dtos.CategoryDto;
+import com.lcwd.electronic.store.ElectronicStores.dtos.PageableResponse;
+
+public interface CategoryService {
+    //create
+    CategoryDto create(CategoryDto categoryDto);
+
+    //update
+    CategoryDto update(CategoryDto categoryDto, String categoryId);
+
+    //delete
+    void delete(String categoryId);
+
+    //get All
+    PageableResponse<CategoryDto> getAll();
+
+    //get single category detail
+    CategoryDto get(String categoryId);
+}
