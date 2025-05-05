@@ -2,38 +2,75 @@ package com.lcwd.electronic.store.ElectronicStores.services.impl;
 
 import com.lcwd.electronic.store.ElectronicStores.dtos.CategoryDto;
 import com.lcwd.electronic.store.ElectronicStores.dtos.PageableResponse;
+import com.lcwd.electronic.store.ElectronicStores.entities.Category;
+import com.lcwd.electronic.store.ElectronicStores.exceptions.ResourceNotFoundException;
+import com.lcwd.electronic.store.ElectronicStores.helper.Helper;
+import com.lcwd.electronic.store.ElectronicStores.repositories.CategoryRepository;
 import com.lcwd.electronic.store.ElectronicStores.services.CategoryService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
-    private CategoryService categoryService;
+    private CategoryRepository categoryRepository;
+
+    @Autowired
+    private ModelMapper mapper;
 
     @Override
     public CategoryDto create(CategoryDto categoryDto) {
-        return null;
+        //creating categoryId:randomly
+
+        String categoryId = UUID.randomUUID().toString();
+        categoryDto.setCategoryId(categoryId);
+        Category category = mapper.map(categoryDto, Category.class);
+        Category savedCategory = categoryRepository.save(category);
+        return mapper.map(savedCategory, CategoryDto.class);
     }
 
     @Override
     public CategoryDto update(CategoryDto categoryDto, String categoryId) {
-        return null;
+
+        //get category of given id
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category not found with given id !!"));
+        //update category details
+        category.setTitle(categoryDto.getTitle());
+        category.setDescription(categoryDto.getDescription());
+        category.setCoverImage(categoryDto.getCoverImage());
+        Category updatedCategory = categoryRepository.save(category);
+        return mapper.map(updatedCategory, CategoryDto.class);
     }
 
     @Override
     public void delete(String categoryId) {
-
+        //get category of given id
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category not found with given id !!"));
+        categoryRepository.delete(category);
     }
 
+
+
     @Override
-    public PageableResponse<CategoryDto> getAll() {
-        return null;
+    public PageableResponse<CategoryDto> getAll(int pageNumber, int pageSize, String sortBy, String sortDir) {
+        Sort sort = (sortDir.equalsIgnoreCase("desc")) ? (Sort.by(sortBy).descending()) : (Sort.by(sortBy).ascending());
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+        Page<Category> page = categoryRepository.findAll(pageable);
+        PageableResponse<CategoryDto> pageableResponse = Helper.getPageableResponse(page, CategoryDto.class);
+        return pageableResponse;
     }
 
     @Override
     public CategoryDto get(String categoryId) {
-        return null;
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category not found with given id !!"));
+        return mapper.map(category, CategoryDto.class);
     }
 }
