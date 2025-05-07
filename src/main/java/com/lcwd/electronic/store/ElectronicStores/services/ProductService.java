@@ -1,8 +1,7 @@
 package com.lcwd.electronic.store.ElectronicStores.services;
 
+import com.lcwd.electronic.store.ElectronicStores.dtos.PageableResponse;
 import com.lcwd.electronic.store.ElectronicStores.dtos.ProductDto;
-
-import java.util.List;
 
 public interface ProductService {
 
@@ -15,15 +14,15 @@ public interface ProductService {
     //delete
     void delete(String productId);
 
-    //get single product
-    ProductDto get(String productDto);
+    //get single
+    ProductDto get(String productId);
 
-    //get all product
-    List<ProductDto> getAll();
+    //get all
+    PageableResponse<ProductDto> getAll(int pageNumber, int pageSize, String sortBy, String sortDir);
 
     //get all : live
-    List<ProductDto> getAllLive();
+    PageableResponse<ProductDto> getAllLive(int pageNumber, int pageSize, String sortBy, String sortDir);
 
     //search product
-    List<ProductDto> searchByTitle(String subTitle);
+    PageableResponse<ProductDto> searchByTitle(String subTitle, int pageNumber, int pageSize, String sortBy, String sortDir);
 }

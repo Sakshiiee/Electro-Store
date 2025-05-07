@@ -1,68 +1,109 @@
 package com.lcwd.electronic.store.ElectronicStores.services.impl;
 
+import com.lcwd.electronic.store.ElectronicStores.dtos.PageableResponse;
 import com.lcwd.electronic.store.ElectronicStores.dtos.ProductDto;
 import com.lcwd.electronic.store.ElectronicStores.entities.Product;
 import com.lcwd.electronic.store.ElectronicStores.exceptions.ResourceNotFoundException;
-import com.lcwd.electronic.store.ElectronicStores.repositories.ProductReository;
+import com.lcwd.electronic.store.ElectronicStores.helper.Helper;
+import com.lcwd.electronic.store.ElectronicStores.repositories.ProductRepository;
 import com.lcwd.electronic.store.ElectronicStores.services.ProductService;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Date;
+import java.util.UUID;
 
+@Service
 public class ProductServiceImpl implements ProductService {
 
     @Autowired
-    private ProductReository productReository;
+    private ProductRepository productRepository;
 
     @Autowired
     private ModelMapper mapper;
 
+    //create
     @Override
     public ProductDto create(ProductDto productDto) {
+
         Product product = mapper.map(productDto, Product.class);
-        Product savedProduct = productReository.save(product);
+        //productId generate
+        String productId = UUID.randomUUID().toString();
+        product.setProductId(productId);
+
+        //added date
+        product.setAddedDate(new Date());
+
+        Product savedProduct = productRepository.save(product);
         return mapper.map(savedProduct, ProductDto.class);
     }
 
+    //update
     @Override
     public ProductDto update(ProductDto productDto, String productId) {
         //fetch the product of given id
-        Product product = productReository.findById(productId).orElseThrow(()-> new ResourceNotFoundException("Product not found of given id !!"));
-        productDto.setTitle(productDto.getTitle());
-        productDto.setDescription(productDto.getDescription());
-        productDto.setPrice(productDto.getPrice());
-        productDto.setDiscountedPrice(productDto.getDiscountedPrice());
-        productDto.setQuantity(productDto.getQuantity());
-        productDto.setLive(productDto.isLive());
-        productDto.setStock(productDto.isStock());
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found of given id !!"));
 
-        Product updatedProduct = productReository.save(product);
+        // Update entity fields from DTO (not DTO to itself)
+        product.setTitle(productDto.getTitle());
+        product.setDescription(productDto.getDescription());
+        product.setPrice(productDto.getPrice());
+        product.setDiscountedPrice(productDto.getDiscountedPrice());
+        product.setQuantity(productDto.getQuantity());
+        product.setLive(productDto.isLive());
+        product.setStock(productDto.isStock());
+
+        Product updatedProduct = productRepository.save(product);
         return mapper.map(updatedProduct, ProductDto.class);
     }
 
+    //delete
     @Override
     public void delete(String productId) {
-
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found of given Id !!"));
+        productRepository.delete(product);
     }
 
+    //get single
     @Override
-    public ProductDto get(String productDto) {
-        return null;
+    public ProductDto get(String productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found of given Id !!"));
+        return mapper.map(product, ProductDto.class);
     }
 
+    //get all
     @Override
-    public List<ProductDto> getAll() {
-        return List.of();
+    public PageableResponse<ProductDto> getAll(int pageNumber, int pageSize, String sortBy, String sortDir) {
+        Sort sort = (sortDir.equalsIgnoreCase("desc")) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+        Page<Product> page = productRepository.findAll(pageable);
+        return Helper.getPageableResponse(page, ProductDto.class);
     }
 
+    //get all : live
     @Override
-    public List<ProductDto> getAllLive() {
-        return List.of();
+    public PageableResponse<ProductDto> getAllLive(int pageNumber, int pageSize, String sortBy, String sortDir) {
+        Sort sort = (sortDir.equalsIgnoreCase("desc")) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+        Page<Product> page = productRepository.findByLiveTrue(pageable);
+        return Helper.getPageableResponse(page, ProductDto.class);
     }
 
+    //search product
     @Override
-    public List<ProductDto> searchByTitle(String subTitle) {
-        return List.of();
+    public PageableResponse<ProductDto> searchByTitle(String subTitle, int pageNumber, int pageSize, String sortBy, String sortDir) {
+        Sort sort = (sortDir.equalsIgnoreCase("desc")) ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+        Page<Product> page = productRepository.findByTitleContaining(subTitle, pageable);
+        return Helper.getPageableResponse(page, ProductDto.class);
     }
 }
