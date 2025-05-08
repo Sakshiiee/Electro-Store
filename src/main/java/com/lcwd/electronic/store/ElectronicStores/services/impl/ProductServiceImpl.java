@@ -47,11 +47,9 @@ public class ProductServiceImpl implements ProductService {
     //update
     @Override
     public ProductDto update(ProductDto productDto, String productId) {
-        //fetch the product of given id
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found of given id !!"));
 
-        // Update entity fields from DTO (not DTO to itself)
+        //fetch the product of given id
+        Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found of given Id !!"));
         product.setTitle(productDto.getTitle());
         product.setDescription(productDto.getDescription());
         product.setPrice(productDto.getPrice());
@@ -59,7 +57,10 @@ public class ProductServiceImpl implements ProductService {
         product.setQuantity(productDto.getQuantity());
         product.setLive(productDto.isLive());
         product.setStock(productDto.isStock());
+        product.setProductImageName(productDto.getProductImageName());
 
+
+//        save the entity
         Product updatedProduct = productRepository.save(product);
         return mapper.map(updatedProduct, ProductDto.class);
     }

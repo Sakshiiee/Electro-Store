@@ -1,9 +1,7 @@
 package com.lcwd.electronic.store.ElectronicStores.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,6 +36,12 @@ public class Product {
     private boolean live;                    // when live value TRUE then this product will live if it is FALSE  if live = true it avaialble
 
     private boolean stock;                   // if admin do FALSE then it will out of stock
+
+    private String productImageName;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "category_id")
+    private Category category;
 
 
 
