@@ -16,6 +16,7 @@
 //}
 package com.lcwd.electronic.store.ElectronicStores.repositories;
 
+import com.lcwd.electronic.store.ElectronicStores.entities.Category;
 import com.lcwd.electronic.store.ElectronicStores.entities.Product;
 //import com.lcwd.electronic.store.entities.Category;
 //import com.lcwd.electronic.store.entities.Product;
@@ -31,7 +32,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 
     Page<Product> findByLiveTrue(Pageable pageable);
 
-//    Page<Product> findByCategory(Category category,Pageable pageable);
+    Page<Product> findByCategory(Category category, Pageable pageable);
 //    //other methods
 //    //custom finder methods
 //    //query methods
