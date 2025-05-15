@@ -3,6 +3,12 @@ package com.lcwd.electronic.store.ElectronicStores.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import javax.management.relation.Role;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,4 +33,11 @@ public class User {
     private String about;
     @Column(name="user_image_name")
     private String imageName;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<Order> orders = new ArrayList<>();
+
+//    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+//    private Set<Role> roles = new HashSet<>();
+
 }
