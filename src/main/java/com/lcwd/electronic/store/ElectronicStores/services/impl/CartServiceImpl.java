@@ -87,6 +87,7 @@ public class CartServiceImpl implements CartService {
 
 //        cart.setItems(updatedItems);
 
+
         //create items
         if (!updated.get()) {
             CartItem cartItem = CartItem.builder()
